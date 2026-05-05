@@ -3,7 +3,7 @@ function Get-SystemInfo {
     $cs = Get-CimInstance Win32_ComputerSystem
     
     return [ordered]@{
-        Hostname    = $env.COMPUTERNAME
+        Hostname    = $env:COMPUTERNAME
         User        = $cs.UserName
         OS          = $os.Caption
         Version     = $os.Version
