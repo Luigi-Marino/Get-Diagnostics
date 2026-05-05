@@ -4,7 +4,7 @@ function Get-DsRegValue {
         [string]$Key
     )
 
-    $line = $Output | Select-String -Pattern "^\s*$Key\s*:\s*(.+)$"
+    $line = $Output -split "`r?`n" | Select-String -Pattern "^\s*$Key\s*:\s*(.+)$"
     if ($line) {
         return $line.Matches.Groups[1].Value.Trim()
     }
