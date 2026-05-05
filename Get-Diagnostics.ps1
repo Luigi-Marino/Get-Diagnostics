@@ -15,6 +15,10 @@ $ModuleNames = @(
     "template_module.psm1",
     "SystemInfo.psm1"
 )
+$TimeStamp = (Get-Date).ToString("yyyyMMdd_HHmmss")
+#$OutputPath = "$env:USERPROFILE\Desktop\DiagnosticsReport_$TimeStamp.json"
+$OutputPath = "C:\Test\DiagnosticsReport_$TimeStamp.json"
+
 
 # ------------------------------------------------------------
 # MODULE LOADER
@@ -114,9 +118,41 @@ $btnRun.Width           = 450
 $btnRun.FlatStyle       = "Flat"
 $form.Controls.Add($btnRun)
 
+# ------------------------------------------------------------
+# RUN DIAGNOSTICS
+# ------------------------------------------------------------
+
+$btnRun.Add_Click({
+
+    $output.Clear()
+    $output.AppendText("Running selected diagnostics. `r`n")
+
+    $results = @{}
+
+    # SYSTEM INFO
+    if ($chkSysInfo.Checked) {
+        $output.AppendText("- Collecting System Info... `r`n")
+        $results.SystemInfo = Get-SystemInfo
+    }
+
+
+    # EXPORT RESULTS
+    $output.AppendText("Exporting Results...`r`n")
+    
+    try {
+        $Results | ConvertTo-Json -Depth 6 | Out-File -FilePath $OutputPath -Encoding UTF8
+        $output.AppendText("`r`n")
+        $output.AppendText("Diagnostic Report Saved: $OutputPath`r`n")
+    }
+    catch {
+        $output.AppendText("`r`n")
+        $output.AppendText("Failed To Export Results.")
+    }
+})
+
 
 # ------------------------------------------------------------
 # ENTRY POINT
 # ------------------------------------------------------------
-Test-Module
+#Test-Module
 $form.ShowDialog()
