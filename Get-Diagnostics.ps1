@@ -17,8 +17,8 @@ $ModuleNames    = @(
     "Enrollment.psm1"
 )
 $TimeStamp      = (Get-Date).ToString("yyyyMMdd_HHmmss")
-#$OutputPath    = "$env:USERPROFILE\Desktop\DiagnosticsReport_$TimeStamp.json"
-$OutputPath     = "C:\Test\DiagnosticsReport_$TimeStamp.json"
+$OutputPath    = "$env:USERPROFILE\Desktop\DiagnosticsReport_$TimeStamp.json"
+#$OutputPath     = "C:\Test\DiagnosticsReport_$TimeStamp.json"
 
 
 # ------------------------------------------------------------
