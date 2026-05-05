@@ -23,6 +23,7 @@ function Load-RemoteModules {
     param($BaseURL, $Modules)
 
     foreach ($m in $Modules) {
+        Write-Host "$BaseURL/modules/$m"
         $url = "$BaseURL/modules/$m"
         $code = Invoke-RestMethod $url
 
