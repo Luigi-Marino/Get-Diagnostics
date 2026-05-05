@@ -9,15 +9,16 @@ Add-Type -AssemblyName System.Drawing
 # ------------------------------------------------------------
 # CONFIGURATION
 # ------------------------------------------------------------
-$Repo = "Get-Diagnostics"
-$RepoBase = "https://raw.githubusercontent.com/Luigi-Marino/$Repo/main"
-$ModuleNames = @(
+$Repo           = "Get-Diagnostics"
+$RepoBase       = "https://raw.githubusercontent.com/Luigi-Marino/$Repo/main"
+$ModuleNames    = @(
     "template_module.psm1",
-    "SystemInfo.psm1"
+    "SystemInfo.psm1",
+    "Enrollment.psm1"
 )
-$TimeStamp = (Get-Date).ToString("yyyyMMdd_HHmmss")
-#$OutputPath = "$env:USERPROFILE\Desktop\DiagnosticsReport_$TimeStamp.json"
-$OutputPath = "C:\Test\DiagnosticsReport_$TimeStamp.json"
+$TimeStamp      = (Get-Date).ToString("yyyyMMdd_HHmmss")
+#$OutputPath    = "$env:USERPROFILE\Desktop\DiagnosticsReport_$TimeStamp.json"
+$OutputPath     = "C:\Test\DiagnosticsReport_$TimeStamp.json"
 
 
 # ------------------------------------------------------------
@@ -28,10 +29,10 @@ function Load-RemoteModules {
 
     foreach ($m in $Modules) {
         Write-Host "$BaseURL/modules/$m"
-        $url = "$BaseURL/modules/$m"
-        $code = Invoke-RestMethod $url
+        $url    = "$BaseURL/modules/$m"
+        $code   = Invoke-RestMethod $url
 
-        $mod = New-Module -ScriptBlock ([ScriptBlock]::Create($code)) -Name $m
+        $mod    = New-Module -ScriptBlock ([ScriptBlock]::Create($code)) -Name $m
         Import-Module $mod -Force
     }
 }
@@ -79,24 +80,26 @@ $group.Controls.Add($flow)
 
 # Checkboxes
 $chkSysInfo             = New-Object System.Windows.Forms.CheckBox
+$chkEnrollment          = New-Object System.Windows.Forms.CheckBox
 $chkHardware            = New-Object System.Windows.Forms.CheckBox
 $chkEventLogs           = New-Object System.Windows.Forms.CheckBox
 $chkNetwork             = New-Object System.Windows.Forms.CheckBox
 $chkProcesses           = New-Object System.Windows.Forms.CheckBox
 
 $chkSysInfo.Text        = "System Info"
+$chkEnrollment.Text     = "Enrollment"
 $chkHardware.Text       = "Hardware Summary"
 $chkEventLogs.Text      = "Event Logs"
 $chkNetwork.Text        = "Network Status"
 $chkProcesses.Text      = "Top Processes"
 
-foreach ($chk in @($chkSysInfo,$chkHardware,$chkEventLogs,$chkNetwork,$chkProcesses)) {
+foreach ($chk in @($chkSysInfo,$chkHardware,$chkHardware,$chkEventLogs,$chkNetwork,$chkProcesses)) {
     $chk.AutoSize = $true
     $chk.MaximumSize = New-Object System.Drawing.Size(180,0)
 }
 
 $flow.Controls.AddRange(@(
-    $chkSysInfo, $chkHardware, $chkEventLogs,
+    $chkSysInfo, $chkEnrollment, $chkHardware, $chkHardware, $chkEventLogs,
     $chkNetwork, $chkProcesses
 ))
 
@@ -135,6 +138,35 @@ $btnRun.Add_Click({
         $results.SystemInfo = Get-SystemInfo
     }
 
+    # ENROLLMENT
+    if ($chkEnrollment.Checked) {
+        $output.AppendText("- Collecting Enrollment Info... `r`n")
+        $results.SystemInfo = Get-Enrollment
+    }
+
+    # HARDWARE
+    if ($chkHardware.Checked) {
+        $output.AppendText("- Collecting hardware summary...`r`n")
+        $results.Hardware = Get-HardwareSummary
+    }
+
+    # EVENT LOGS
+    if ($chkEventLogs.Checked) {
+        $output.AppendText("- Collecting event logs...`r`n")
+        $results.EventLogs = Get-RecentEventLogs
+    }
+
+    # NETWORK
+    if ($chkNetwork.Checked) {
+        $output.AppendText("- Collecting network status...`r`n")
+        $results.Network = Get-NetworkDiagnostics -IncludeSpeedTest -AllowAdapterReset:$true
+    }
+
+    # PROCESSES
+    if ($chkProcesses.Checked) {
+        $output.AppendText("- Collecting top processes...`r`n")
+        $results.Processes = Get-TopProcesses
+    }
 
     # EXPORT RESULTS
     $output.AppendText("Exporting Results...`r`n")
