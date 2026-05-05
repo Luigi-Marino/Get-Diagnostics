@@ -9,7 +9,7 @@ Add-Type -AssemblyName System.Drawing
 # ------------------------------------------------------------
 # CONFIGURATION
 # ------------------------------------------------------------
-$Repo = "Powershell_App_Template"
+$Repo = "Get-Diagnostics"
 $RepoBase = "https://raw.githubusercontent.com/Luigi-Marino/$Repo/main"
 $ModuleNames = @(
     "template_module.psm1",
