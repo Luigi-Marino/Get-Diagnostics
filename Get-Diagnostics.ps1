@@ -141,7 +141,7 @@ $btnRun.Add_Click({
     # ENROLLMENT
     if ($chkEnrollment.Checked) {
         $output.AppendText("- Collecting Enrollment Info... `r`n")
-        $results.SystemInfo = Get-Enrollment
+        $results.Enrollment = Get-Enrollment
     }
 
     # HARDWARE
