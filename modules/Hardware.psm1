@@ -19,3 +19,5 @@ function Get-HardwareSummary {
         Drives          = $drives
     }
 }
+
+Export-ModuleMember -Function Get-HardwareSummary
