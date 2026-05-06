@@ -10,8 +10,8 @@ function Get-SystemInfo {
         Manufacturer    = $cs.Manufacturer
         Model           = $cs.Model
         SerialNumber    = (Get-CimInstance Win32_BIOS).SerialNumber
-        LastBoot        = [Management.ManagementDateTimeConverter]::ToDateTime($os.LastBootUpTime)
-        InstallDate     = [Management.ManagementDateTimeConverter]::ToDateTime($os.InstallDate)
+        LastBoot        = [datetime]$os.LastBootUpTime
+        InstallDate     = [datetime]$os.InstallDate
 
     }
 }
