@@ -14,11 +14,12 @@ $RepoBase       = "https://raw.githubusercontent.com/Luigi-Marino/$Repo/main"
 $ModuleNames    = @(
     "template_module.psm1",
     "SystemInfo.psm1",
-    "Enrollment.psm1"
+    "Enrollment.psm1",
+    "Hardware.psm1"
 )
 $TimeStamp      = (Get-Date).ToString("yyyyMMdd_HHmmss")
-$OutputPath    = "$env:USERPROFILE\Desktop\DiagnosticsReport_$TimeStamp.json"
-#$OutputPath     = "C:\Test\DiagnosticsReport_$TimeStamp.json"
+#$OutputPath    = "$env:USERPROFILE\Desktop\DiagnosticsReport_$TimeStamp.json"
+$OutputPath     = "C:\Test\DiagnosticsReport_$TimeStamp.json"
 
 
 # ------------------------------------------------------------
@@ -135,38 +136,94 @@ $btnRun.Add_Click({
     # SYSTEM INFO
     if ($chkSysInfo.Checked) {
         $output.AppendText("- Collecting System Info... `r`n")
-        $results.SystemInfo = Get-SystemInfo
+        try {
+            $results.SystemInfo = Get-SystemInfo
+        }
+        catch {
+            $results.SystemInfo = [ordered]@{
+                Success = $false
+                Error   = $_.Exception.Message
+            }
+            $output.AppendText("Error: Failed to collect System Info. `r`n")
+        }
+        
     }
 
     # ENROLLMENT
     if ($chkEnrollment.Checked) {
         $output.AppendText("- Collecting Enrollment Info... `r`n")
-        $results.Enrollment = Get-Enrollment
+        try {
+            $results.Enrollment = Get-Enrollment
+        }
+        catch {
+            $results.Enrollment = [ordered]@{
+                Success = $false
+                Error   = $_.Exception.Message
+            }
+            $output.AppendText("  -> Enrollment module FAILED: $($_.Exception.Message)`r`n")
+        }
     }
 
     # HARDWARE
     if ($chkHardware.Checked) {
         $output.AppendText("- Collecting hardware summary...`r`n")
-        $results.Hardware = Get-HardwareSummary
+        try {
+            $results.Hardware = Get-HardwareSummary
+        }
+        catch {
+            $results.Hardware = [ordered]@{
+                Success = $false
+                Error   = $_.Exception.Message
+            }
+            $output.AppendText("  -> Hardware module FAILED: $($_.Exception.Message)`r`n")
+        }
     }
 
     # EVENT LOGS
     if ($chkEventLogs.Checked) {
         $output.AppendText("- Collecting event logs...`r`n")
-        $results.EventLogs = Get-RecentEventLogs
+        try {
+            $results.EventLogs = Get-RecentEventLogs
+        }
+        catch {
+            $results.EventLogs = [ordered]@{
+                Success = $false
+                Error   = $_.Exception.Message
+            }
+            $output.AppendText("  -> Event Logs module FAILED: $($_.Exception.Message)`r`n")
+        }
     }
 
     # NETWORK
     if ($chkNetwork.Checked) {
         $output.AppendText("- Collecting network status...`r`n")
-        $results.Network = Get-NetworkDiagnostics -IncludeSpeedTest -AllowAdapterReset:$true
+        try {
+            $results.Network = Get-NetworkDiagnostics -IncludeSpeedTest -AllowAdapterReset:$true
+        }
+        catch {
+            $results.Network = [ordered]@{
+                Success = $false
+                Error   = $_.Exception.Message
+            }
+            $output.AppendText("  -> Network module FAILED: $($_.Exception.Message)`r`n")
+        }
     }
 
     # PROCESSES
     if ($chkProcesses.Checked) {
         $output.AppendText("- Collecting top processes...`r`n")
-        $results.Processes = Get-TopProcesses
+        try {
+            $results.Processes = Get-TopProcesses
+        }
+        catch {
+            $results.Processes = [ordered]@{
+                Success = $false
+                Error   = $_.Exception.Message
+            }
+            $output.AppendText("  -> Processes module FAILED: $($_.Exception.Message)`r`n")
+        }
     }
+
 
     # EXPORT RESULTS
     $output.AppendText("Exporting Results...`r`n")
